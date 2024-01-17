@@ -24,7 +24,7 @@ def create_sources(source_urls):
     
     sources_list = list(source_urls) # source_urls is a set
 
-    st.write("Sources:")
+    st.write("**Sources**:")
 
     for (file_path, nr_page) in sources_list:
         show_pdf(file_path, nr_page)
@@ -55,10 +55,10 @@ with st.sidebar:
     )
     if gpt_version == 'GPT-4':
         deployment_name = 'gpt4'
-        st.write('Token limit: 8,192')
+        st.write('Tokens limit: 8,192')
     else:
         deployment_name = 'gpt-35-turbo'
-        st.write('Token limit: 4,096')
+        st.write('Tokens limit: 4,096')
 
     st.markdown('---')
         
