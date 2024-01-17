@@ -42,28 +42,42 @@ if "chat_history" not in st.session_state:
 
 st.title("**Chat**_:red[FPT]_")
 
-st.sidebar.empty()
+message = st.chat_message("ai",  avatar="🤖")
+message.write("Ciao! How may AI help you?")
 
+
+with st.sidebar:
+    
+    gpt_version = st.selectbox(
+        label='Model version',
+        options=('GPT-3.5', 'GPT-4'),
+        index=1,
+    )
+    if gpt_version == 'GPT-4':
+        deployment_name = 'gpt4'
+        st.write('Token limit: 8,192')
+    else:
+        deployment_name = 'gpt-35-turbo'
+        st.write('Token limit: 4,096')
+
+    st.markdown('---')
+        
 prompt = st.chat_input(placeholder="Please enter your prompt here ...")
 if prompt:
     with st.spinner("Generating response ..."):
         with get_openai_callback() as cb:
-            
-            generated_response = run_llm(query=prompt, chat_history=st.session_state["chat_history"])
+
+            generated_response = run_llm(query=prompt, chat_history=st.session_state["chat_history"], deployment_name=deployment_name)
             sources = set([(doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]])
-        
+                
             formated_response = (generated_response['answer'] , sources)
-        
+                
             st.session_state["chat_history"].append((prompt, generated_response["answer"]))
             st.session_state["user_prompt_history"].append(prompt)
             st.session_state["chat_answers_history"].append(formated_response)
 
             with st.sidebar:
                 st.text(cb)
-
-                
-message = st.chat_message("ai",  avatar="🤖")
-message.write("Ciao! How may AI help you?")
 
 
 if st.session_state["chat_answers_history"]:

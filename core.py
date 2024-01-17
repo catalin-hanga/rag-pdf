@@ -9,30 +9,29 @@ from langchain_community.vectorstores import FAISS
 from typing import Any, Dict, List, Tuple
 
 
-def run_llm(query: str, chat_history: List[Tuple[str, Any]] = []) -> Any: 
+def run_llm(query: str, chat_history: List[Tuple[str, Any]] = [], deployment_name: str = "gpt4") -> Any: 
     
     embeddings = AzureOpenAIEmbeddings(
                 azure_deployment = "text-embedding-ada-002"
-            )
+    )
     
     docsearch = FAISS.load_local(
-                    folder_path="faiss-index",
-                    embeddings=embeddings
-                    )
+                    folder_path = "faiss-index",
+                    embeddings = embeddings
+    )
     
     chat = AzureChatOpenAI(
-                           azure_deployment="gpt4",
-                           #azure_deployment = "gpt-35-turbo",
-                           verbose=True, 
-                           temperature=0
+                           azure_deployment = deployment_name,
+                           verbose = True, 
+                           temperature = 0
     )
 
     qa = ConversationalRetrievalChain.from_llm(
-                     llm=chat,
-                     chain_type="stuff",
+                     llm = chat,
+                     chain_type = "stuff",
                      retriever=docsearch.as_retriever(), 
-                     return_source_documents=True,
-                     )
+                     return_source_documents = True,
+    )
     
     return qa.invoke( {"question": query, "chat_history": chat_history})
     
