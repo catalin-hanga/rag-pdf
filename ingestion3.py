@@ -1,18 +1,23 @@
-import os, glob, time
+import os
+import glob
+import time
 from tqdm import tqdm
-from langchain.document_loaders import PyPDFLoader, MergedDataLoader
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from langchain_community.document_loaders import MergedDataLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_openai.embeddings import AzureOpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.docstore.document import Document
 
-os.environ['OPENAI_API_TYPE'] = "azure"
-os.environ['OPENAI_API_KEY']  = "eac36d2da3a4436aa801debaa529517b"
-os.environ['OPENAI_API_BASE'] = "https://openai-ailab-002.openai.azure.com/"
-os.environ['OPENAI_API_VERSION'] = "2023-05-15"
 
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-doc =  Document(page_content="text", metadata={"source": "local"})
+embeddings = AzureOpenAIEmbeddings(
+        azure_deployment = "text-embedding-ada-002"
+    )
+
+doc =  Document(page_content="text", metadata={"source": "local"}) # create an empty document
 vectorstore_final = FAISS.from_documents([doc], embeddings)
 
 pdf_path = '/home/ec2-user/VSA_ReportDB_for_AI/**'
@@ -23,10 +28,11 @@ for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
         extension = filename.split('.')[-1].lower()
         
         if extension == 'pdf':
-            loader = PyPDFLoader(file_path=filename)
 
+            loader = PyPDFLoader(file_path=filename)
             document = loader.load()
 
+            # increment page number
             for page in document:
                 page.metadata['page'] += 1
 
@@ -36,9 +42,8 @@ for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
             for i in range(len(chunks)):
                 vectorstore_temp = FAISS.from_documents([chunks[i]], embeddings)
                 vectorstore_final.merge_from(vectorstore_temp)
-                time.sleep(0.1)
+#                time.sleep(0.01)
 
-
-#print(vectorstore_final.docstore._dict)
+vectorstore_final.delete([vectorstore_final.index_to_docstore_id[0]]) # delete the initial empty document
 vectorstore_final.save_local("./faiss-index-new")
 print("****** Added to FAISS vectorstore vectors")

@@ -4,17 +4,10 @@ from core import run_llm
 
 import streamlit as st
 from streamlit_chat import message
+
 import datetime
 import base64
 
-def greetings():
-    now = datetime.datetime.now().time()
-    if now < datetime.time(12,0,0):
-        return "Good morning,"
-    elif now < datetime.time(18,0,0):
-        return "Good afternoon,"
-    else:
-        return "Good evening,"
 
 def show_pdf(file_path, nr_page):
     with st.expander(file_path.replace("/home/ec2-user/", "") + " - page " + str(nr_page)):
@@ -33,8 +26,7 @@ def create_sources(source_urls):
     st.write("Sources:")
 
     for (file_path, nr_page) in sources_list:
-#        show_pdf(file_path, nr_page)
-        show_pdf(file_path.replace('\\\\nas_arbon\\sensitive\\ArtificialIntelligence', '/home/ec2-user').replace('\\', '/'), nr_page)
+        show_pdf(file_path, nr_page)
         
 
 if "user_prompt_history" not in st.session_state:

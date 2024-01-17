@@ -1,5 +1,7 @@
-openai==0.28.1
+openai
 langchain
+langchain-community
+langchain-openai
 faiss-cpu
 python-dotenv
 streamlit

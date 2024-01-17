@@ -1,32 +1,31 @@
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
-os.environ["OPENAI_API_TYPE"] = "azure"
-os.environ["OPENAI_API_KEY"] = "eac36d2da3a4436aa801debaa529517b"
-os.environ["OPENAI_API_BASE"] = "https://openai-ailab-002.openai.azure.com/" 
-os.environ["OPENAI_API_VERSION"] = "2023-05-15" 
-
-from langchain.chat_models import AzureChatOpenAI
-#from langchain.schema import HumanMessage
-
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from langchain.vectorstores import FAISS 
+from langchain_openai import AzureChatOpenAI
+from langchain_openai.embeddings import AzureOpenAIEmbeddings
+from langchain.chains import ConversationalRetrievalChain
+from langchain_community.vectorstores import FAISS 
 
 from typing import Any, Dict, List, Tuple
 
 
 def run_llm(query: str, chat_history: List[Tuple[str, Any]] = []) -> Any: 
-    embeddings = OpenAIEmbeddings() 
+    
+    embeddings = AzureOpenAIEmbeddings(
+                azure_deployment = "text-embedding-ada-002"
+            )
     
     docsearch = FAISS.load_local(
-                    folder_path="faiss-index",
+                    folder_path="faiss-index-new",
                     embeddings=embeddings
                     )
     
-    chat = AzureChatOpenAI(deployment_name="gpt4",
-                           #deployment_name = "gpt-35-turbo", 
+    chat = AzureChatOpenAI(
+                           azure_deployment="gpt4",
+                           #azure_deployment = "gpt-35-turbo",
                            verbose=True, 
-                           temperature=0)
+                           temperature=0
+    )
 
     qa = ConversationalRetrievalChain.from_llm(
                      llm=chat,
@@ -35,7 +34,7 @@ def run_llm(query: str, chat_history: List[Tuple[str, Any]] = []) -> Any:
                      return_source_documents=True,
                      )
     
-    return qa( {"question": query, "chat_history": chat_history})
+    return qa.invoke( {"question": query, "chat_history": chat_history})
     
 
 #if __name__ == "__main__":

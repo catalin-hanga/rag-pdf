@@ -1,10 +1,12 @@
+import os
+import glob
 import pickle
-import os, glob
+
 from tqdm import tqdm
-from langchain.document_loaders import PyPDFLoader, MergedDataLoader
+from langchain_community.document_loaders import MergedDataLoader, PyPDFLoader
 
 loaders_list = []
-pdf_path = '/home/ec2-user/FEM-23-002/**'
+pdf_path = '/home/ec2-user/VSA_ReportDB_for_AI/**'
 
 for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
     
@@ -19,9 +21,9 @@ loader_all = MergedDataLoader(loaders=loaders_list)
 docs_all = loader_all.load()
 print("Loaded", len(loaders_list), "pdf documents, with", len(docs_all), "pages in total")
 
-# fix page number
+# increment page number
 for p in docs_all:
     p.metadata['page'] += 1
 
-with open("docs.txt", "wb") as fp:
+with open("docs-temporary.txt", "wb") as fp:
     pickle.dump(docs_all, fp)
