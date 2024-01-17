@@ -8,6 +8,7 @@ from streamlit_chat import message
 import datetime
 import base64
 
+from langchain_community.callbacks import get_openai_callback
 
 def show_pdf(file_path, nr_page):
     with st.expander(file_path.replace("/home/ec2-user/", "") + " - page " + str(nr_page)):
@@ -41,20 +42,26 @@ if "chat_history" not in st.session_state:
 
 st.title("**Chat**_:red[FPT]_")
 
-prompt = st.chat_input(placeholder="Please enter your prompt here...")
+st.sidebar.empty()
 
-
+prompt = st.chat_input(placeholder="Please enter your prompt here ...")
 if prompt:
-    with st.spinner("Generating response..."):
-        generated_response = run_llm(query=prompt, chat_history=st.session_state["chat_history"])
-        sources = set([(doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]])
+    with st.spinner("Generating response ..."):
+        with get_openai_callback() as cb:
+            
+            generated_response = run_llm(query=prompt, chat_history=st.session_state["chat_history"])
+            sources = set([(doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]])
         
-        formated_response = (generated_response['answer'] , sources)
+            formated_response = (generated_response['answer'] , sources)
         
-        st.session_state["chat_history"].append((prompt, generated_response["answer"]))
-        st.session_state["user_prompt_history"].append(prompt)
-        st.session_state["chat_answers_history"].append(formated_response)
+            st.session_state["chat_history"].append((prompt, generated_response["answer"]))
+            st.session_state["user_prompt_history"].append(prompt)
+            st.session_state["chat_answers_history"].append(formated_response)
 
+            with st.sidebar:
+                st.text(cb)
+
+                
 message = st.chat_message("ai",  avatar="🤖")
 message.write("Ciao! How may AI help you?")
 

@@ -16,7 +16,7 @@ def run_llm(query: str, chat_history: List[Tuple[str, Any]] = []) -> Any:
             )
     
     docsearch = FAISS.load_local(
-                    folder_path="faiss-index-new",
+                    folder_path="faiss-index",
                     embeddings=embeddings
                     )
     
