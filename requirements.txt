@@ -1,0 +1,17 @@
+openai==0.28.1
+langchain
+faiss-cpu
+python-dotenv
+streamlit
+streamlit-chat
+pypdf
+
+beautifulsoup4
+black
+tiktoken
+unstructured
+nltk
+fastapi
+jinja2
+uvicorn
+tqdm
