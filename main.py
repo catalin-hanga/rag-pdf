@@ -67,7 +67,7 @@ if prompt:
     with st.spinner("Generating response ..."):
         with get_openai_callback() as cb:
 
-            generated_response = run_llm(query=prompt, chat_history=st.session_state["chat_history"], deployment_name=deployment_name)
+            generated_response = run_llm(question=prompt, chat_history=st.session_state["chat_history"], deployment_name=deployment_name)
             sources = set([(doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]])
                 
             formated_response = (generated_response['answer'] , sources)
