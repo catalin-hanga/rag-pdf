@@ -11,26 +11,24 @@ import base64
 from langchain_community.callbacks import get_openai_callback
 
 
-def show_pdf(file_path, nr_page):
-    with st.expander(
-        file_path.replace("/home/ec2-user", "") + " - page " + str(nr_page)
-    ):
-        with open(file_path, "rb") as f:
-            base64_pdf = base64.b64encode(f.read()).decode("utf-8")
+def show_pdf(i, file_path, nr_page):
+    reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
+
+    with st.expander(reference):
+        with open(file_path, 'rb') as f:
+            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
         pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#page={nr_page}" width="650" height="500" type="application/pdf"></iframe>'
         st.markdown(pdf_display, unsafe_allow_html=True)
 
 
-def create_sources(source_urls):
-    if not source_urls:
-        return ""
-
-    sources_list = list(source_urls)  # source_urls is a set
-
+def create_sources(sources_list):
+    if not sources_list:
+        return ''
+    
     st.write("**Sources**:")
 
-    for file_path, nr_page in sources_list:
-        show_pdf(file_path, nr_page)
+    for (i, (file_path, nr_page)) in enumerate(sources_list):
+        show_pdf((i+1), file_path, nr_page)
 
 
 if "user_prompt_history" not in st.session_state:
@@ -80,7 +78,6 @@ with st.sidebar:
         deployment_name = "gpt-35-turbo"
         st.write("Tokens limit: 4,096")
 
-    st.markdown("---")
 
 prompt = st.chat_input(placeholder="Please enter your prompt here ...")
 if prompt:
@@ -96,11 +93,11 @@ if prompt:
                 score_threshold = score_threshold,
             )
             
-            sources = set(
+            sources =list( 
                 [
                     (doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]
                 ]
-            )
+             ) # should not contain any duplicates
 
             formated_response = (generated_response["answer"], sources)
 

@@ -32,12 +32,12 @@ def run_llm(
         temperature=0
     )
 
-
     template = (
                         "Combine the chat history and follow up question into a standalone question." 
                         "Chat History: {chat_history}"
                         "Follow up question: {question}"
     )
+    
     condense_question_prompt = PromptTemplate.from_template(template)
 
     qa = ConversationalRetrievalChain.from_llm(
@@ -48,6 +48,10 @@ def run_llm(
         #condense_question_prompt=condense_question_prompt,       
         retriever=docsearch.as_retriever(search_type = search_type, search_kwargs={"k": k, "score_threshold": score_threshold}),
     )
+
+#    q = condense_question_prompt.format(question=question, chat_history=chat_history)
+#    print(q)
+#    print(chat.invoke(q))
 
     return qa.invoke({'question': question, 'chat_history': chat_history})
 
