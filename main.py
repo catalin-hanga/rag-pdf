@@ -11,14 +11,17 @@ import base64
 from langchain_community.callbacks import get_openai_callback
 
 
-def show_pdf(i, file_path, nr_page):
-    # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
-    reference = file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
+def show_pdf(i, file_path, page, score):
+    
+    # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
+    reference = file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
+    if show_scores:
+        reference = reference + ' (score: ' + str(round(score, 3)) + ')'
     
     with st.expander(reference):
         with open(file_path, 'rb') as f:
             base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#page={nr_page}" width="650" height="500" type="application/pdf"></iframe>'
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#page={page}" width="650" height="500" type="application/pdf"></iframe>'
         st.markdown(pdf_display, unsafe_allow_html=True)
 
 
@@ -28,8 +31,8 @@ def create_sources(sources_list):
     
     st.write("**Sources**:")
 
-    for (i, (file_path, nr_page)) in enumerate(sources_list):
-        show_pdf((i+1), file_path, nr_page)
+    for (i, (file_path, page, score)) in enumerate(sources_list):
+        show_pdf((i+1), file_path, page, score)
 
 
 if "user_prompt_history" not in st.session_state:
@@ -52,25 +55,23 @@ with st.sidebar:
     
     search_type = st.selectbox(
         label="Search type",
-        options=("similarity", "similarity score threshold", "maximum marginal relevance"),
+        options=("similarity", "similarity score threshold"),
         help="todo"
     )
 
-    param_label = "score threshold"
     if search_type == "similarity score threshold":
         search_type = "similarity_score_threshold"
-    if search_type == "maximum marginal relevance":
-        search_type = "mmr"
-        param_label = "lambda mult"
 
     col1, col2 = st.columns(2)
 
     with col1:
-        k = st.number_input(label='k', min_value=1, value=3, step=1, help="todo")
+        k = st.number_input(label="k", min_value=1, value=3, step=1, help="todo")
 
     with col2:
-        param = st.number_input(label=param_label, min_value=0.0, max_value=1.0, value=0.5, step=0.01, help="todo")
-    
+        score_threshold = st.number_input(label="score threshold", min_value=0.0, max_value=1.0, value=0.5, step=0.01, help="todo")
+
+    show_scores = st.toggle(label = "show scores", value=True, help="todo")
+        
     st.markdown("---")
 
     deployment_name = st.selectbox(
@@ -98,12 +99,12 @@ if prompt:
                 deployment_name = deployment_name,
                 search_type = search_type,
                 k = k,
-                param = param,
+                score_threshold = score_threshold,
             )
             
-            sources =list( 
+            sources = list( 
                 [
-                    (doc.metadata["source"], doc.metadata["page"]) for doc in generated_response["source_documents"]
+                    (doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]
                 ]
              ) # should not contain any duplicates
 
