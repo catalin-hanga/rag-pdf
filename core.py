@@ -42,7 +42,7 @@ def run_llm(
         
     embeddings = AzureOpenAIEmbeddings(azure_deployment = 'text-embedding-ada-002')
 
-    docsearch = FAISS.load_local(
+    vectorstore = FAISS.load_local(
         folder_path = 'faiss-index-1000-100',
         embeddings = embeddings
     )
@@ -67,9 +67,9 @@ def run_llm(
         return_source_documents = True,
 #        response_if_no_docs_found = 'Unfortunately, I am unable to find any information available on this topic',
 #        condense_question_prompt=condense_question_prompt,        
-#        retriever = docsearch.as_retriever(search_type = search_type, search_kwargs = {"k": k, "score_threshold": score_threshold} ),
+#        retriever = vectorstore.as_retriever(search_type = search_type, search_kwargs = {"k": k, "score_threshold": score_threshold} ),
         retriever = MyVectorStoreRetriever(
-               vectorstore = docsearch,
+               vectorstore = vectorstore,
 #               search_type = search_type, # not necessary
                search_kwargs = {"k": k, "score_threshold": score_threshold},
             )
@@ -77,7 +77,6 @@ def run_llm(
 
 #    cqp = condense_question_prompt.format(question = question, chat_history = chat_history)
 #    condensed_question = llm.invoke(cqp)
-#    print(condensed_question)
 
     return qa.invoke({'question': question, 'chat_history': chat_history})
 
