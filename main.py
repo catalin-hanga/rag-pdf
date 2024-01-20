@@ -65,10 +65,10 @@ with st.sidebar:
     col1, col2 = st.columns(2)
 
     with col1:
-        k = st.number_input(label="k", min_value=1, value=3, step=1, help="todo")
+        k = st.number_input(label="k", min_value=1, value=3, help="todo")
 
     with col2:
-        score_threshold = st.number_input(label="score threshold", min_value=0.0, max_value=1.0, value=0.5, step=0.01, help="todo")
+        score_threshold = st.number_input(label="score threshold", min_value=0.0, max_value=1.0, value=0.5, format='%.3f', help="todo")
 
     show_scores = st.toggle(label = "show scores", value=True, help="todo")
         

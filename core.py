@@ -32,7 +32,7 @@ def run_llm(
                 docs_and_similarities = (self.vectorstore.similarity_search_with_relevance_scores(query, **self.search_kwargs))
         
             # Make the score part of the document metadata
-            for doc, similarity in docs_and_similarities:
+            for (doc, similarity) in docs_and_similarities:
                 doc.metadata["score"] = similarity
 
             docs = [doc for doc, _ in docs_and_similarities]
@@ -66,12 +66,11 @@ def run_llm(
         chain_type = 'stuff',
         return_source_documents = True,
         response_if_no_docs_found = 'Unfortunately, I am unable to find any information available on this topic',
-#        condense_question_prompt=condense_question_prompt,
-        
+#        condense_question_prompt=condense_question_prompt,        
 #        retriever = docsearch.as_retriever(search_type = search_type, search_kwargs = {"k": k, "score_threshold": score_threshold} ),
         retriever = MyVectorStoreRetriever(
                vectorstore = docsearch,
-               search_type = search_type, # can be removed
+#               search_type = search_type, # not necessary
                search_kwargs = {"k": k, "score_threshold": score_threshold},
             )
     )
