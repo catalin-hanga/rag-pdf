@@ -88,13 +88,13 @@ with st.sidebar:
         st.write("Tokens limit: 4096")
 
 
-prompt = st.chat_input(placeholder="Please enter your prompt here ...")
-if prompt:
+question = st.chat_input(placeholder="Please enter your prompt here ...")
+if question:
     with st.spinner("Generating response ..."):
         with get_openai_callback() as cb:
             
             generated_response = run_llm(
-                question = prompt,
+                question = question,
                 chat_history = st.session_state["chat_history"],
                 deployment_name = deployment_name,
                 search_type = search_type,
@@ -110,10 +110,8 @@ if prompt:
 
             formated_response = (generated_response["answer"], sources)
 
-            st.session_state["chat_history"].append(
-                (prompt, generated_response["answer"])
-            )
-            st.session_state["user_prompt_history"].append(prompt)
+            st.session_state["chat_history"].append((question, generated_response["answer"]))
+            st.session_state["user_prompt_history"].append(question)
             st.session_state["chat_answers_history"].append(formated_response)
 
             with st.sidebar:
