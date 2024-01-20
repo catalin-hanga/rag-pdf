@@ -12,8 +12,9 @@ from langchain_community.callbacks import get_openai_callback
 
 
 def show_pdf(i, file_path, nr_page):
-    reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
-
+    # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
+    reference = file_path.replace('/home/ec2-user', '') + ' - page ' + str(nr_page)
+    
     with st.expander(reference):
         with open(file_path, 'rb') as f:
             base64_pdf = base64.b64encode(f.read()).decode('utf-8')
@@ -51,9 +52,16 @@ with st.sidebar:
     
     search_type = st.selectbox(
         label="Search type",
-        options=("similarity", "similarity_score_threshold"),
+        options=("similarity", "similarity score threshold", "maximum marginal relevance"),
         help="todo"
     )
+
+    param_label = "score threshold"
+    if search_type == "similarity score threshold":
+        search_type = "similarity_score_threshold"
+    if search_type == "maximum marginal relevance":
+        search_type = "mmr"
+        param_label = "lambda mult"
 
     col1, col2 = st.columns(2)
 
@@ -61,22 +69,22 @@ with st.sidebar:
         k = st.number_input(label='k', min_value=1, value=3, step=1, help="todo")
 
     with col2:
-        score_threshold = st.number_input(label='score threshold', min_value=0.0, max_value=1.0, value=0.5, step=0.01, help="todo")
+        param = st.number_input(label=param_label, min_value=0.0, max_value=1.0, value=0.5, step=0.01, help="todo")
     
     st.markdown("---")
 
-    gpt_version = st.selectbox(
+    deployment_name = st.selectbox(
         label="Model version",
         options=("GPT-3.5", "GPT-4"),
         index=1,
         help="todo"
     )
-    if gpt_version == "GPT-4":
+    if deployment_name == "GPT-4":
         deployment_name = "gpt4"
-        st.write("Tokens limit: 8,192")
+        st.write("Tokens limit: 8192")
     else:
         deployment_name = "gpt-35-turbo"
-        st.write("Tokens limit: 4,096")
+        st.write("Tokens limit: 4096")
 
 
 prompt = st.chat_input(placeholder="Please enter your prompt here ...")
@@ -90,7 +98,7 @@ if prompt:
                 deployment_name = deployment_name,
                 search_type = search_type,
                 k = k,
-                score_threshold = score_threshold,
+                param = param,
             )
             
             sources =list( 

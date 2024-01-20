@@ -1,4 +1,4 @@
 .env
-.env~
 __pycache__
 faiss-index*
+ingestion_v2.py
