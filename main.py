@@ -16,7 +16,7 @@ def show_pdf(i, file_path, page, score):
     # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
     reference = file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
     if show_scores:
-        reference = reference + ' (score: ' + str(round(score, 3)) + ')'
+        reference = reference + ' (score: ' + str(round(score, 4)) + ')'
     
     with st.expander(reference):
         with open(file_path, 'rb') as f:
@@ -68,7 +68,7 @@ with st.sidebar:
         k = st.number_input(label="k", min_value=1, value=3, help="todo")
 
     with col2:
-        score_threshold = st.number_input(label="score threshold", min_value=0.0, max_value=1.0, value=0.5, format='%.3f', help="todo")
+        score_threshold = st.number_input(label="score threshold", min_value=0.0, max_value=1.0, value=0.5, format='%.4f', help="todo")
 
     show_scores = st.toggle(label = "show scores", value=True, help="todo")
         

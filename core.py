@@ -65,7 +65,7 @@ def run_llm(
         llm = llm,
         chain_type = 'stuff',
         return_source_documents = True,
-        response_if_no_docs_found = 'Unfortunately, I am unable to find any information available on this topic',
+#        response_if_no_docs_found = 'Unfortunately, I am unable to find any information available on this topic',
 #        condense_question_prompt=condense_question_prompt,        
 #        retriever = docsearch.as_retriever(search_type = search_type, search_kwargs = {"k": k, "score_threshold": score_threshold} ),
         retriever = MyVectorStoreRetriever(
