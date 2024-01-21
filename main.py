@@ -1,4 +1,4 @@
-from core import run_llm   
+from core import run_llm
 
 import streamlit as st
 from streamlit_chat import message
@@ -11,7 +11,7 @@ from base64 import b64encode
 def show_pdf(i, file_path, page, score):
     
     # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
-    reference = file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
+    reference = file_path[file_path.find('VSA_ReportDB_for_AI'):] + ' - page ' + str(page)
     if show_scores:
         reference = reference + ' (score: ' + str(round(score, 4)) + ')'
     
