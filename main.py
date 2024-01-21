@@ -41,7 +41,7 @@ if "chat_answers_history" not in st.session_state:
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
-
+st.set_page_config(page_title="ChatFPT", page_icon=":car:")
 st.title("**Chat**_:red[FPT]_")
 
 message = st.chat_message("ai", avatar="🤖")
@@ -88,7 +88,7 @@ with st.sidebar:
 
 question = st.chat_input(placeholder="Please enter your prompt here ...")
 if question:
-    with st.spinner("Generating response ..."):
+    with st.spinner("Wait for it ... :hourglass_flowing_sand:"):
         with get_openai_callback() as cb:
             
             generated_response = run_llm(
@@ -127,3 +127,6 @@ if st.session_state["chat_answers_history"]:
         message = st.chat_message("ai", avatar="🤖")
         message.write(formated_response[0])
         create_sources(formated_response[1])
+
+#st.balloons()
+#st.snow()
