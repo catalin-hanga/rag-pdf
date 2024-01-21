@@ -5,7 +5,6 @@ from core import run_llm
 import streamlit as st
 from streamlit_chat import message
 
-import datetime
 import base64
 
 from langchain_community.callbacks import get_openai_callback
@@ -56,6 +55,7 @@ with st.sidebar:
     search_type = st.selectbox(
         label="Search type",
         options=("similarity", "similarity score threshold"),
+        index=0,
         help="todo"
     )
 
