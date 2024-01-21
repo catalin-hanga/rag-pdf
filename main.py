@@ -1,13 +1,11 @@
-from typing import Set
-
 from core import run_llm
 
 import streamlit as st
 from streamlit_chat import message
 
-import base64
-
 from langchain_community.callbacks import get_openai_callback
+from typing import Set
+from base64 import b64encode
 
 
 def show_pdf(i, file_path, page, score):
@@ -19,8 +17,8 @@ def show_pdf(i, file_path, page, score):
     
     with st.expander(reference):
         with open(file_path, 'rb') as f:
-            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#page={page}" width="650" height="500" type="application/pdf"></iframe>'
+            base64_pdf = b64encode(f.read()).decode('utf-8')
+        pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#page={page}" width={650} height={500} type="application/pdf"></iframe>'
         st.markdown(pdf_display, unsafe_allow_html=True)
 
 
