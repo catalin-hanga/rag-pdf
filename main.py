@@ -42,7 +42,7 @@ if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
 st.set_page_config(page_title="ChatFPT", page_icon=":car:")
-st.title("**Chat**_:red[FPT]_")
+st.title("**Chat**_:red[FPT]_ :speech_balloon:")
 
 message = st.chat_message("ai", avatar="🤖")
 message.write("Ciao! How may AI help you?")
