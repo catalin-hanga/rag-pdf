@@ -22,7 +22,7 @@ def show_pdf(i, file_path, page, score):
         st.markdown(pdf_display, unsafe_allow_html=True)
 
 
-def create_sources(sources_list):
+def display_sources(sources_list):
     if not sources_list:
         return ''
     
@@ -44,8 +44,8 @@ if "chat_history" not in st.session_state:
 st.set_page_config(page_title="ChatFPT", page_icon=":car:")
 st.title("**Chat**_:red[FPT]_ :speech_balloon:")
 
-message = st.chat_message("ai", avatar="🤖")
-message.write("Ciao! How may AI help you?")
+with st.chat_message(name="ai", avatar="🤖"):
+    st.write("Ciao! How may AI help you?")
 
 
 with st.sidebar:
@@ -121,12 +121,13 @@ if st.session_state["chat_answers_history"]:
         st.session_state["chat_answers_history"],
         st.session_state["user_prompt_history"],
     ):
-        message = st.chat_message("user", avatar="👨‍🔬")
-        message.write(user_query)
 
-        message = st.chat_message("ai", avatar="🤖")
-        message.write(formated_response[0])
-        create_sources(formated_response[1])
+        with st.chat_message(name="user", avatar="👨‍🔬"):
+            st.write(user_query)
+
+        with st.chat_message(name="ai", avatar="🤖"):
+            st.write(formated_response[0])
+            display_sources(formated_response[1])
 
 #st.balloons()
 #st.snow()

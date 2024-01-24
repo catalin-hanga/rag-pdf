@@ -1,6 +1,6 @@
 import os
 import glob
-import time
+#import time
 from tqdm import tqdm
 
 from dotenv import load_dotenv
@@ -17,7 +17,8 @@ embeddings = AzureOpenAIEmbeddings(azure_deployment="text-embedding-ada-002")
 doc = Document(page_content="text", metadata={"source": "local"})  # create an empty document
 vectorstore_final = FAISS.from_documents([doc], embeddings)
 
-pdf_path = "/home/ec2-user/VSA_ReportDB_for_AI/**"
+pdf_path = "C:/Users/f06428e/Desktop/rag-poc/VSA_ReportDB_for_AI/**"
+# pdf_path = "/home/ec2-user/VSA_ReportDB_for_AI/**"
 
 chunk_size = 1000
 chunk_overlap = 100
@@ -54,7 +55,7 @@ for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
             nr_chunks += len(chunks)
 
 
-print("Processed", nr_docs, "documents, with a total of", nr_pages, "pages and ", nr_chunks, "chunks")
+print("Processed", nr_docs, "documents, with a total of", nr_pages, "pages and", nr_chunks, "chunks")
 vectorstore_final.delete([vectorstore_final.index_to_docstore_id[0]])  # delete the initial empty document
 vectorstore_final.save_local("faiss-index-" + str(chunk_size) + "-" + str(chunk_overlap))
 print("****** Added to FAISS vectorstore vectors")
