@@ -32,17 +32,21 @@ def display_sources(sources_list):
         show_pdf((i+1), file_path, page, score)
 
 
+# Initialize chat history
+
 if "user_prompt_history" not in st.session_state:
     st.session_state["user_prompt_history"] = []
-
+    
 if "chat_answers_history" not in st.session_state:
     st.session_state["chat_answers_history"] = []
-
+    
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
+
 st.set_page_config(page_title="ChatFPT", page_icon=":car:")
 st.title("**Chat**_:red[FPT]_ :speech_balloon:")
+
 
 with st.chat_message(name="ai", avatar="🤖"):
     st.write("Ciao! How may AI help you?")
@@ -86,9 +90,10 @@ with st.sidebar:
         st.write("Tokens limit: 4096")
 
 
+# React to user input
 question = st.chat_input(placeholder="Please enter your prompt here ...")
 if question:
-    with st.spinner("Wait for it ... :hourglass_flowing_sand:"):
+    with st.spinner(text="Wait for it ... :hourglass_flowing_sand:"):
         with get_openai_callback() as cb:
             
             generated_response = run_llm(
@@ -100,30 +105,32 @@ if question:
                 score_threshold = score_threshold,
             )
             
-            sources = list( 
-                [
-                    (doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]
-                ]
-             ) # should not contain any duplicates
-
-            formated_response = (generated_response["answer"], sources)
-
+            metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
+            # should not contain any duplicates
+            
+            formated_response = (generated_response["answer"], metadata)
+            
+#            print(generated_response, '\n')
+#            print(formated_response)
+            
             st.session_state["chat_history"].append((question, generated_response["answer"]))
             st.session_state["user_prompt_history"].append(question)
             st.session_state["chat_answers_history"].append(formated_response)
+            
+#            print(st.session_state)
 
             with st.sidebar:
                 st.text(cb)
 
 
+# Display chat messages from history on app rerun
 if st.session_state["chat_answers_history"]:
-    for formated_response, user_query in zip(
-        st.session_state["chat_answers_history"],
+    for (question, formated_response) in zip(
         st.session_state["user_prompt_history"],
-    ):
-
+        st.session_state["chat_answers_history"],
+    ):       
         with st.chat_message(name="user", avatar="👨‍🔬"):
-            st.write(user_query)
+            st.write(question)
 
         with st.chat_message(name="ai", avatar="🤖"):
             st.write(formated_response[0])
