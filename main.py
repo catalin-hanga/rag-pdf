@@ -1,3 +1,4 @@
+import time
 from core import run_llm
 
 import streamlit as st
@@ -8,6 +9,8 @@ from typing import Set
 from base64 import b64encode
 
 
+#@st.cache_data
+#@st.cache_resource
 def show_pdf(i, file_path, page, score):
     
     # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
@@ -48,10 +51,6 @@ st.set_page_config(page_title="ChatFPT", page_icon=":car:")
 st.title("**Chat**_:red[FPT]_ :speech_balloon:")
 
 
-with st.chat_message(name="ai", avatar="🤖"):
-    st.write("Ciao! How may AI help you?")
-
-
 with st.sidebar:
     
     search_type = st.selectbox(
@@ -90,38 +89,8 @@ with st.sidebar:
         st.write("Tokens limit: 4096")
 
 
-# React to user input
-question = st.chat_input(placeholder="Please enter your prompt here ...")
-if question:
-    with st.spinner(text="Wait for it ... :hourglass_flowing_sand:"):
-        with get_openai_callback() as cb:
-            
-            generated_response = run_llm(
-                question = question,
-                chat_history = st.session_state["chat_history"],
-                deployment_name = deployment_name,
-                search_type = search_type,
-                k = k,
-                score_threshold = score_threshold,
-            )
-            
-            metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
-            # should not contain any duplicates
-            
-            formated_response = (generated_response["answer"], metadata)
-            
-#            print(generated_response, '\n')
-#            print(formated_response)
-            
-            st.session_state["chat_history"].append((question, generated_response["answer"]))
-            st.session_state["user_prompt_history"].append(question)
-            st.session_state["chat_answers_history"].append(formated_response)
-            
-#            print(st.session_state)
-
-            with st.sidebar:
-                st.text(cb)
-
+with st.chat_message(name="ai", avatar="🤖"):
+    st.markdown("Ciao! How may AI help you?")
 
 # Display chat messages from history on app rerun
 if st.session_state["chat_answers_history"]:
@@ -130,11 +99,63 @@ if st.session_state["chat_answers_history"]:
         st.session_state["chat_answers_history"],
     ):       
         with st.chat_message(name="user", avatar="👨‍🔬"):
-            st.write(question)
+            st.markdown(question)
 
         with st.chat_message(name="ai", avatar="🤖"):
-            st.write(formated_response[0])
+            st.markdown(formated_response[0])
             display_sources(formated_response[1])
+
+
+text_area_id = "my_text_area"
+scroll_script = f"""
+<script>
+  var textArea = document.getElementById("{text_area_id}");
+  textArea.scrollTop = textArea.scrollHeight;
+</script>
+"""
+
+# React to user input
+question = st.chat_input(placeholder="Please enter your prompt here ...")
+if question:
+    st.markdown(scroll_script, unsafe_allow_html=True)
+
+    with st.chat_message(name="user", avatar="👨‍🔬"):
+        st.markdown(question)
+
+    with st.chat_message(name="ai", avatar="🤖"):
+        with st.spinner(text="Wait for it ... :hourglass_flowing_sand:"):
+
+            with get_openai_callback() as cb:
+                generated_response = run_llm(
+                    question = question,
+                    chat_history = st.session_state["chat_history"],
+                    deployment_name = deployment_name,
+                    search_type = search_type,
+                    k  = k,
+                    score_threshold = score_threshold,
+                )
+                with st.sidebar:
+                    st.text(cb)
+            
+            # should not contain any duplicates 
+            metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
+            formated_response = (generated_response["answer"], metadata)
+
+            placeholder = st.empty()
+            full_response = ''
+            for item in formated_response[0]:
+                full_response += item
+                time.sleep(0.01)
+                placeholder.markdown(full_response + "▌")
+            placeholder.markdown(full_response)
+
+#            st.markdown(formated_response[0])
+            display_sources(formated_response[1])
+
+    st.session_state["chat_history"].append((question, generated_response["answer"]))
+    st.session_state["user_prompt_history"].append(question)
+    st.session_state["chat_answers_history"].append(formated_response)
+
 
 #st.balloons()
 #st.snow()

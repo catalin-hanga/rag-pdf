@@ -3,3 +3,4 @@ __pycache__
 faiss-index*
 ingestion_v2.py
 VSA_ReportDB_for_AI
+main-old.py
