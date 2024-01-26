@@ -116,7 +116,8 @@ scroll_script = f"""
 </script>
 """
 
-wait = ["Wait for it", "Just a moment, please", "Thinking", "Generating answer"]
+wait_message = ["Wait for it ... ", "Just a moment, please ... ", "Thinking ... ", "Generating answer ... "]
+wait_emoji = [":hourglass_flowing_sand:", ":timer_clock:", ":stopwatch:", ":alarm_clock:", ":mantelpiece_clock:"]
 
 # React to user input
 question = st.chat_input(placeholder="Please enter your prompt here ...")
@@ -127,7 +128,7 @@ if question:
         st.markdown(question)
 
     with st.chat_message(name="ai", avatar="🤖"):
-        with st.spinner(text=random.choice(wait) + " ... :hourglass_flowing_sand:"):
+        with st.spinner(text=random.choice(wait_message) + random.choice(wait_emoji)):
 
             with get_openai_callback() as cb:
                 generated_response = run_llm(
