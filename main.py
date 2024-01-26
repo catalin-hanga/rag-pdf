@@ -116,7 +116,8 @@ scroll_script = f"""
 </script>
 """
 
-wait_message = ["Wait for it ... ", "Just a moment, please ... ", "Thinking ... ", "Generating answer ... "]
+wait_message = ["Wait for it ... ", "Just a moment, please ... ", "Thinking ... ", "Generating answer ... ", 
+                "Working on it ... ", "Please be patient ... ", "Any moment now ... "]
 wait_emoji = [":hourglass_flowing_sand:", ":timer_clock:", ":stopwatch:", ":alarm_clock:", ":mantelpiece_clock:"]
 
 # React to user input
