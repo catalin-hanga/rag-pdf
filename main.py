@@ -1,4 +1,6 @@
 import time
+import random 
+
 from core import run_llm
 
 import streamlit as st
@@ -114,6 +116,8 @@ scroll_script = f"""
 </script>
 """
 
+wait = ["Wait for it", "Just a moment, please", "Thinking", "Generating answer"]
+
 # React to user input
 question = st.chat_input(placeholder="Please enter your prompt here ...")
 if question:
@@ -123,7 +127,7 @@ if question:
         st.markdown(question)
 
     with st.chat_message(name="ai", avatar="🤖"):
-        with st.spinner(text="Wait for it ... :hourglass_flowing_sand:"):
+        with st.spinner(text=random.choice(wait) + " ... :hourglass_flowing_sand:"):
 
             with get_openai_callback() as cb:
                 generated_response = run_llm(
