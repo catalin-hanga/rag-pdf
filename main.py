@@ -31,7 +31,7 @@ def display_sources(sources_list):
     if not sources_list:
         return ''
     
-    st.write("**Sources**:")
+    st.write("**search results**:")
 
     for (i, (file_path, page, score)) in enumerate(sources_list):
         show_pdf((i+1), file_path, page, score)
