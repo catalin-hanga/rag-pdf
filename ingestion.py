@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langchain_community.vectorstores import FAISS
-from langchain_community.document_loaders import MergedDataLoader, PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader # MergedDataLoader
 from langchain_openai.embeddings import AzureOpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 
 embeddings = AzureOpenAIEmbeddings(azure_deployment="text-embedding-ada-002")
 
-doc = Document(page_content="text", metadata={"source": "local"})  # create an empty document
+doc = Document(page_content="text", metadata={"source": "local"})  # create a dummy document
 vectorstore_final = FAISS.from_documents([doc], embeddings)
 
 pdf_path = "C:/Users/f06428e/Desktop/rag-poc/VSA_ReportDB_for_AI/**"
@@ -56,6 +56,6 @@ for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
 
 
 print("Processed", nr_docs, "documents, with a total of", nr_pages, "pages and", nr_chunks, "chunks")
-vectorstore_final.delete([vectorstore_final.index_to_docstore_id[0]])  # delete the initial empty document
+vectorstore_final.delete([vectorstore_final.index_to_docstore_id[0]])  # delete the initial dummy document
 vectorstore_final.save_local("faiss-index-" + str(chunk_size) + "-" + str(chunk_overlap))
 print("****** Added to FAISS vectorstore vectors")
