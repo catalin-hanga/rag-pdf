@@ -41,7 +41,7 @@ for filename in tqdm(glob.iglob(pdf_path, recursive=True)):
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=chunk_size,
                 chunk_overlap=chunk_overlap,
-                separators=["\n\n", "\n", " ", ""],
+                separators=["\n\n", "\n", " ", ""], # default
             )
             chunks = text_splitter.split_documents(documents=document)
 
