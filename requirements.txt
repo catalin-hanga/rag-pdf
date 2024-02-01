@@ -5,8 +5,9 @@ langchain-openai
 faiss-cpu
 python-dotenv
 streamlit
-streamlit-chat
 pypdf
+python-pptx
+punkt
 
 beautifulsoup4
 black

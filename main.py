@@ -4,15 +4,11 @@ import random
 from core import run_llm
 
 import streamlit as st
-from streamlit_chat import message
-
 from langchain_community.callbacks import get_openai_callback
 from typing import Set
 from base64 import b64encode
 
 
-#@st.cache_data
-#@st.cache_resource
 def show_pdf(i, file_path, page, score):
     
     # reference = '(' + str(i) + ') ' + file_path.replace('/home/ec2-user', '') + ' - page ' + str(page)
@@ -50,7 +46,7 @@ if "chat_history" not in st.session_state:
 
 
 st.set_page_config(page_title="ChatFPT", page_icon=":car:")
-st.title("**Chat**_:red[FPT]_ :speech_balloon:")
+st.title(body="**Chat**_:red[FPT]_ :speech_balloon:")
 
 
 with st.sidebar:
@@ -92,9 +88,12 @@ with st.sidebar:
 
 
 with st.chat_message(name="ai", avatar="🤖"):
-    st.markdown("Ciao! How may AI help you?")
+    st.markdown("Ciao! How may AI help you?") # not appended to conversation history
 
-# Display chat messages from history on app rerun
+if question := st.chat_input(placeholder="Please enter your prompt here ...") :
+        st.session_state["user_prompt_history"].append(question)
+
+# Display previous question-answer pairs, if they exists
 if st.session_state["chat_answers_history"]:
     for (question, formated_response) in zip(
         st.session_state["user_prompt_history"],
@@ -108,23 +107,14 @@ if st.session_state["chat_answers_history"]:
             display_sources(formated_response[1])
 
 
-text_area_id = "my_text_area"
-scroll_script = f"""
-<script>
-  var textArea = document.getElementById("{text_area_id}");
-  textArea.scrollTop = textArea.scrollHeight;
-</script>
-"""
-
 wait_message = ["Wait for it ... ", "Just a moment, please ... ", "Thinking ... ", "Generating answer ... ", 
-                "Working on it ... ", "Please be patient ... ", "Any moment now ... "]
+                "Working on it ... ", "Any moment now ... ", "Please wait ... "]
 wait_emoji = [":hourglass_flowing_sand:", ":timer_clock:", ":stopwatch:", ":alarm_clock:", ":mantelpiece_clock:"]
 
-# React to user input
-question = st.chat_input(placeholder="Please enter your prompt here ...")
-if question:
-    st.markdown(scroll_script, unsafe_allow_html=True)
+# display and answer the latest user question
+if st.session_state["user_prompt_history"]:
 
+    question = st.session_state["user_prompt_history"][-1]
     with st.chat_message(name="user", avatar="👨‍🔬"):
         st.markdown(question)
 
@@ -159,7 +149,6 @@ if question:
             display_sources(formated_response[1])
 
     st.session_state["chat_history"].append((question, generated_response["answer"]))
-    st.session_state["user_prompt_history"].append(question)
     st.session_state["chat_answers_history"].append(formated_response)
 
 
