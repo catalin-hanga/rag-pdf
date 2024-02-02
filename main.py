@@ -3,8 +3,8 @@ import random
 
 from core import run_llm
 
-import streamlit as st
 from langchain_community.callbacks import get_openai_callback
+import streamlit as st
 from typing import Set
 from base64 import b64encode
 
@@ -93,7 +93,7 @@ with st.chat_message(name="ai", avatar="🤖"):
     st.markdown("Ciao! How may AI help you?") # not appended to the chat history
 
 if question := st.chat_input(placeholder="Please enter your prompt here ...") :
-    if len(st.session_state["chat_history"])==0 or question != st.session_state["chat_history"][-1][0]:
+    if len(st.session_state["chat_history"]) == 0 or question != st.session_state["chat_history"][-1][0]:
         st.session_state["user_prompt_history"].append(question)
 
 # Display previous question-answer pairs, if they exists
