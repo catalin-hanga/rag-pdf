@@ -48,7 +48,7 @@ if "chat_history" not in st.session_state:
 st.set_page_config(page_title="ChatFPT", page_icon=":car:")
 st.title(body="**Chat**_:red[FPT]_ :speech_balloon:")
 
-#--------------------------------------------------------------
+#---------------------------------------------------------------
 
 with st.sidebar:
     
@@ -87,23 +87,21 @@ with st.sidebar:
         deployment_name = "gpt-35-turbo"
         st.write("Tokens limit: 4096")
 
-#--------------------------------------------------------------
+#---------------------------------------------------------------
 
 with st.chat_message(name="ai", avatar="🤖"):
     st.markdown("Ciao! How may AI help you?") # not appended to the chat history
 
-if question := st.chat_input(placeholder="Please enter your prompt here ...") :
-    if len(st.session_state["chat_history"]) == 0 or question != st.session_state["chat_history"][-1][0]:
-        st.session_state["user_prompt_history"].append(question)
+question = st.chat_input(placeholder="Please enter your prompt here ...")
 
 # Display previous question-answer pairs, if they exists
 if st.session_state["chat_answers_history"]:
-    for (question, formated_response) in zip(
+    for (user_question, formated_response) in zip(
         st.session_state["user_prompt_history"],
         st.session_state["chat_answers_history"],
     ):       
         with st.chat_message(name="user", avatar="👨‍🔬"):
-            st.markdown(question)
+            st.markdown(user_question)
 
         with st.chat_message(name="ai", avatar="🤖"):
             st.markdown(formated_response[0])
@@ -114,49 +112,47 @@ wait_message = ["Wait for it ... ", "Just a moment, please ... ", "Thinking ... 
 wait_emoji = [":hourglass_flowing_sand:", ":timer_clock:", ":stopwatch:", ":alarm_clock:", ":mantelpiece_clock:"]
 
 # display and answer the latest user question
-if st.session_state["user_prompt_history"]:
+if question:
 
-    question = st.session_state["user_prompt_history"][-1]
-    if len(st.session_state["chat_history"]) == 0 or question != st.session_state["chat_history"][-1][0]:
+    with st.chat_message(name="user", avatar="👨‍🔬"):
+        st.markdown(question)
 
-        with st.chat_message(name="user", avatar="👨‍🔬"):
-            st.markdown(question)
-
-        with st.chat_message(name="ai", avatar="🤖"):
-            with st.spinner(text = random.choice(wait_message) + random.choice(wait_emoji)):
+    with st.chat_message(name="ai", avatar="🤖"):
+        with st.spinner(text = random.choice(wait_message) + random.choice(wait_emoji)):
             
-                with get_openai_callback() as cb:
-                    generated_response = run_llm(
-                        question = question,
-                        chat_history = st.session_state["chat_history"],
-                        deployment_name = deployment_name,
-                        search_type = search_type,
-                        k  = k,
-                        score_threshold = score_threshold,
-                    )
-                    with st.sidebar:
-                        st.text(cb)
+            with get_openai_callback() as cb:
+                generated_response = run_llm(
+                    question = question,
+                    chat_history = st.session_state["chat_history"],
+                    deployment_name = deployment_name,
+                    search_type = search_type,
+                    k  = k,
+                    score_threshold = score_threshold,
+                )
+                with st.sidebar:
+                    st.text(cb)
             
 #               for x in generated_response["source_documents"]:
 #                    print(x.page_content, '\n')
 
-                # should not contain any duplicates 
-                metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
-                formated_response = (generated_response["answer"], metadata)
+            # should not contain any duplicates 
+            metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
+            formated_response = (generated_response["answer"], metadata)
 
-                placeholder = st.empty()
-                full_response = ''
-                for item in formated_response[0]:
-                    full_response += item
-                    time.sleep(0.01)
-                    placeholder.markdown(full_response + "▌")
-                placeholder.markdown(full_response)
+            placeholder = st.empty()
+            full_response = ''
+            for item in formated_response[0]:
+                full_response += item
+                time.sleep(0.01)
+                placeholder.markdown(full_response + "▌")
+            placeholder.markdown(full_response)
 
-#               st.markdown(formated_response[0])
-                display_sources(formated_response[1])
+            # st.markdown(formated_response[0])
+            display_sources(formated_response[1])
 
-        st.session_state["chat_history"].append((question, generated_response["answer"]))
-        st.session_state["chat_answers_history"].append(formated_response)
+    st.session_state["user_prompt_history"].append(question)
+    st.session_state["chat_history"].append((question, generated_response["answer"]))
+    st.session_state["chat_answers_history"].append(formated_response)
 
 #st.balloons()
 #st.snow()
