@@ -21,7 +21,7 @@ def run_llm(
         search_type: str = 'similarity',
         k: int = 3,
         score_threshold: float = 0.5,
-) -> Any:
+) -> Dict:
 
     class MyVectorStoreRetriever(VectorStoreRetriever):
         def _get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun) -> List[Document]:
