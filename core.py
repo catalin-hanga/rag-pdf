@@ -35,7 +35,7 @@ def run_llm(
             for (doc, similarity) in docs_and_similarities:
                 doc.metadata["score"] = similarity
 
-            docs = [doc for doc, _ in docs_and_similarities]
+            docs = [doc for (doc, _) in docs_and_similarities]
             
             return docs
 

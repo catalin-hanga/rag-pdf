@@ -131,9 +131,6 @@ if question:
                 )
                 with st.sidebar:
                     st.text(cb)
-            
-#               for x in generated_response["source_documents"]:
-#                    print(x.page_content, '\n')
 
             # should not contain any duplicates 
             metadata = list([(doc.metadata["source"], doc.metadata["page"], doc.metadata["score"]) for doc in generated_response["source_documents"]]) 
